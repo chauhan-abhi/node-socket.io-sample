@@ -16,14 +16,24 @@ var server = http.createServer(app)
 // communicate between server and clients 
 var io = socketIO(server)
 io.on('connection', (socket) => {
-    console.log('New user connected')
+     console.log('New user connected')
+
+     socket.emit('newMessage', {
+        from: 'Admin',
+        text: 'Welcome to chat app',
+        createdAt: new Date().getTime() 
+
+    })
+
+    socket.broadcast.emit('newMessage', {
+        from: 'Admin',
+        text: "New user joined",
+        createdAt: new Date().getTime() 
+
+    })
+
 
     //emit function can be used on both client and server
-    // socket.emit('newEmail', {
-    //     from: 'shubham@gmail.com',
-    //     text: 'Hey! Whats going on'
-    // })
-
     /******* emit message to single connection ***************/
     // socket.emit('newMessage', {
     //     from: 'ABHISSS',
@@ -31,21 +41,24 @@ io.on('connection', (socket) => {
     //     completedAt: 1234
     // })
 
-    // data in event from client to server
-    // socket.on('createEmail', (newEmail) => {
-    //     console.log(newEmail)
-    // })
 
+
+    // data in event from client to server
     // listen to create Message
     socket.on('createMessage', (message) => {
         console.log('createMessage', message)
-        //emit event to every single connection
+        /********emit event to every single connection **********/
         io.emit('newMessage', {
             from: message.from,
             text: message.text,
             createdAt: new Date().getTime()    
         })
-
+        /*******send event to everybody but this socket *************/
+        // socket.broadcast.emit('newMessage', {
+        //     from: message.from,
+        //     text: message.text,
+        //     createdAt: new Date().getTime() 
+        // })
     })
     
     socket.on('disconnect', () => {

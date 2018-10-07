@@ -10,10 +10,10 @@ socket.on('connect', function() {
     // })
 
 
-    socket.emit('createMessage', {
-        from: "Abhi",
-        text: 'Works for me'
-    })
+    // socket.emit('createMessage', {
+    //     from: "Abhi",
+    //     text: 'Works for me'
+    // })
 })
 
 socket.on('disconnect', function() {

@@ -4,6 +4,7 @@ const http = require('http')
 const express = require('express')
 const socketIO = require('socket.io')
 
+//prevent from first going into server directory then going out and then to public
 const publicPath = path.join(__dirname, '../public')
 const port = process.env.PORT || 8000
 var app = express()
@@ -23,11 +24,12 @@ io.on('connection', (socket) => {
     //     text: 'Hey! Whats going on'
     // })
 
-    socket.emit('newMessage', {
-        from: 'ABHISSS',
-        text: 'See u',
-        completedAt: 1234
-    })
+    /******* emit message to single connection ***************/
+    // socket.emit('newMessage', {
+    //     from: 'ABHISSS',
+    //     text: 'See u',
+    //     completedAt: 1234
+    // })
 
     // data in event from client to server
     // socket.on('createEmail', (newEmail) => {
@@ -37,6 +39,13 @@ io.on('connection', (socket) => {
     // listen to create Message
     socket.on('createMessage', (message) => {
         console.log('createMessage', message)
+        //emit event to every single connection
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()    
+        })
+
     })
     
     socket.on('disconnect', () => {

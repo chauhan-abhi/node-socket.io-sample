@@ -16,6 +16,28 @@ var server = http.createServer(app)
 var io = socketIO(server)
 io.on('connection', (socket) => {
     console.log('New user connected')
+
+    //emit function can be used on both client and server
+    // socket.emit('newEmail', {
+    //     from: 'shubham@gmail.com',
+    //     text: 'Hey! Whats going on'
+    // })
+
+    socket.emit('newMessage', {
+        from: 'ABHISSS',
+        text: 'See u',
+        completedAt: 1234
+    })
+
+    // data in event from client to server
+    // socket.on('createEmail', (newEmail) => {
+    //     console.log(newEmail)
+    // })
+
+    // listen to create Message
+    socket.on('createMessage', (message) => {
+        console.log('createMessage', message)
+    })
     
     socket.on('disconnect', () => {
         console.log('User was disconnected')

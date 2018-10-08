@@ -24,6 +24,14 @@ socket.on('newMessage', function(message) {
     console.log(message)   
 })
 
+// run some code when acknowleged arrives from server
+socket.emit('createMessage', {
+    from: 'PR',
+    text: 'Hi'
+}, function(data) {
+    console.log('Acknowledgement received', data)
+})
+
 // custom  event handler from server
 // data passed from server is provided here in callback function
 // socket.on('newEmail', function(email) {

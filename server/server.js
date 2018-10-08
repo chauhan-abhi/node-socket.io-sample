@@ -3,27 +3,36 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const socketIO = require('socket.io')
+const {generateMessage} = require('./utils/message')
 
+
+//path provided to express  static middleware
+// old way
+//console.log(__dirname + '/../public')
+//better way 
+//console.log(publicPath)
 //prevent from first going into server directory then going out and then to public
 const publicPath = path.join(__dirname, '../public')
 const port = process.env.PORT || 8000
 var app = express()
-
 //app.listen calls this in its backend
 var server = http.createServer(app) 
-  
 // get back web socket server--> emit or listen to events
 // communicate between server and clients 
 var io = socketIO(server)
+//configure middleware 
+app.use(express.static(publicPath))
+
+
+
 io.on('connection', (socket) => {
-    console.log('New user connected')
+     console.log('New user connected')
+
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the CHAT App'))
+
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'))
 
     //emit function can be used on both client and server
-    // socket.emit('newEmail', {
-    //     from: 'shubham@gmail.com',
-    //     text: 'Hey! Whats going on'
-    // })
-
     /******* emit message to single connection ***************/
     // socket.emit('newMessage', {
     //     from: 'ABHISSS',
@@ -32,20 +41,20 @@ io.on('connection', (socket) => {
     // })
 
     // data in event from client to server
-    // socket.on('createEmail', (newEmail) => {
-    //     console.log(newEmail)
-    // })
-
     // listen to create Message
-    socket.on('createMessage', (message) => {
+    socket.on('createMessage', (message, callback) => {
         console.log('createMessage', message)
-        //emit event to every single connection
-        io.emit('newMessage', {
-            from: message.from,
-            text: message.text,
-            createdAt: new Date().getTime()    
-        })
+        /********emit event to every single connection **********/
+        io.emit('newMessage', generateMessage(message.from, message.text))
+        /***send acknowledgement to server-> can send objects also *********/
+        callback('This is from server')
 
+        /*******send event to everybody but this socket *************/
+        // socket.broadcast.emit('newMessage', {
+        //     from: message.from,
+        //     text: message.text,
+        //     createdAt: new Date().getTime() 
+        // })
     })
     
     socket.on('disconnect', () => {
@@ -54,21 +63,10 @@ io.on('connection', (socket) => {
 })
 
 
-
-//path provided to express  static middleware
-// old way
-//console.log(__dirname + '/../public')
-//better way 
-//console.log(publicPath)
-
-//configure middleware 
-app.use(express.static(publicPath))
-
-/*****we will use http server instead of express server******/
 // app.listen(port, () => {
 //     console.log(`Server is up on ${port}`)
 // })
-
+/*****we will use http server instead of express server******/
 server.listen(port, () => {
     console.log(`Server is up on ${port}`)
 })

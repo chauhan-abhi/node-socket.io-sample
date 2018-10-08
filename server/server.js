@@ -15,17 +15,20 @@ const {generateMessage} = require('./utils/message')
 const publicPath = path.join(__dirname, '../public')
 const port = process.env.PORT || 8000
 var app = express()
-
 //app.listen calls this in its backend
 var server = http.createServer(app) 
-  
 // get back web socket server--> emit or listen to events
 // communicate between server and clients 
 var io = socketIO(server)
-io.on('connection', (socket) => {
-     console.log('New user connected')
+//configure middleware 
+app.use(express.static(publicPath))
 
-     socket.emit('newMessage', generateMessage('Admin', 'Welcome to the CHAT App'))
+
+
+io.on('connection', (socket) => {
+    console.log('New user connected')
+
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the CHAT App'))
 
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'))
 
@@ -39,10 +42,13 @@ io.on('connection', (socket) => {
 
     // data in event from client to server
     // listen to create Message
-    socket.on('createMessage', (message) => {
+    socket.on('createMessage', (message, callback) => {
         console.log('createMessage', message)
         /********emit event to every single connection **********/
         io.emit('newMessage', generateMessage(message.from, message.text))
+        /***send acknowledgement to server-> can send objects also *********/
+        callback('This is from server')
+
         /*******send event to everybody but this socket *************/
         // socket.broadcast.emit('newMessage', {
         //     from: message.from,
@@ -56,8 +62,6 @@ io.on('connection', (socket) => {
     })
 })
 
-//configure middleware 
-app.use(express.static(publicPath))
 
 // app.listen(port, () => {
 //     console.log(`Server is up on ${port}`)

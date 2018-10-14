@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
         console.log('createMessage', message)
         /********emit event to every single connection **********/
         io.emit('newMessage', generateMessage(message.from, message.text))
-        /***send acknowledgement to server-> can send objects also *********/
+        /***send acknowledgement to server-> can send data objects also *********/
         callback('This is from server')
 
         /*******send event to everybody but this socket *************/

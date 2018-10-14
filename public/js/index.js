@@ -21,19 +21,36 @@ socket.on('disconnect', function() {
 })
 
 socket.on('newMessage', function(message) {
-    console.log(message)   
+    console.log(message) 
+    var li = jQuery('<li></li>') 
+
+    li.text(`${message.from}: ${message.text}`)
+    jQuery('#messages').append(li)
+ 
 })
 
 // run some code when acknowleged arrives from server
-socket.emit('createMessage', {
-    from: 'PR',
-    text: 'Hi'
-}, function(data) {
-    console.log('Acknowledgement received', data)
-})
+// socket.emit('createMessage', {
+//     from: 'PR',
+//     text: 'Hi'
+// }, function(data) {
+//     console.log('Acknowledgement received', data)
+// })
 
 // custom  event handler from server
 // data passed from server is provided here in callback function
 // socket.on('newEmail', function(email) {
 //     console.log('New Email', email)
 // })
+
+
+jQuery("#message-form").on('submit', function(event) {
+    event.preventDefault()
+    socket.emit('createMessage', {
+        from: 'User',
+        //select input from name 
+        text: jQuery('[name=message]').val()
+    }, function() {
+
+    })
+})

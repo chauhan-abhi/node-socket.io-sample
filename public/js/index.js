@@ -34,9 +34,6 @@ socket.on('disconnect', function() {
 //     console.log('New Email', email)
 // })
 
-
-
-
 socket.on('newMessage', function(message) {
     console.log(message) 
     var li = jQuery('<li></li>') 
@@ -59,12 +56,14 @@ socket.on('newLocationMessage', function(message) {
 //directly using jquery
 jQuery("#message-form").on('submit', function(event) {
     event.preventDefault()
+    var messageTextBox = jQuery('[name=message]')
     socket.emit('createMessage', {
         from: 'User',
         //select input from name 
-        text: jQuery('[name=message]').val()
+        text: messageTextBox.val()
     }, function() {
-
+        //clear the text box value
+        messageTextBox.val('')
     })
 })
 
@@ -74,8 +73,10 @@ locationButton.on('click', function(){
     if(!navigator.geolocation) {
         return alert('Geolocatio not supported by your browser')
     }
+    locationButton.attr('disabled', 'disabled').text('Sending location...')
     
     navigator.geolocation.getCurrentPosition(function(position) {
+        locationButton.removeAttr('disabled').text('Send location')
         //access given
         //success function -> emit event
         socket.emit('createLocationMessage', {
@@ -83,6 +84,7 @@ locationButton.on('click', function(){
             longitude: position.coords.longitude
         })
     }, function() {
+        locationButton.removeAttr('disabled').text('Send location')
         alert('Unable to fetch location')
     })
 

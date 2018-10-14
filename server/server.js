@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
         /********emit event to every single connection **********/
         io.emit('newMessage', generateMessage(message.from, message.text))
         /***send acknowledgement to server-> can send data objects also *********/
-        callback('This is from server')
+        callback()
     })
 
     socket.on('createLocationMessage', (coords) => {

@@ -20,6 +20,18 @@ function scrollToButtom() {
 
 
 socket.on('connect', function() {
+    var parmas = jQuery.deparam(window.location.search)
+    //emit join event by client to server .
+    // when server listens to this its going to set of process of setting a room
+    socket.emit('join', parmas, function(err) {
+        if(err) {
+           alert(err)
+           //redirect to home page 
+           window.location.href = "/" 
+        } else {
+            console.log('No error')
+        }
+    })
     console.log('Connected to server')  
     
     //create email event

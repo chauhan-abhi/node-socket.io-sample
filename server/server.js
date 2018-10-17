@@ -3,8 +3,9 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const socketIO = require('socket.io')
-const {generateMessage, generateLocationMessage} = require('./utils/message')
 
+const {generateMessage, generateLocationMessage} = require('./utils/message')
+const {isRealString} = require('./utils/validation')
 
 //path provided to express  static middleware
 // old way
@@ -39,6 +40,15 @@ io.on('connection', (socket) => {
     //     text: 'See u',
     //     completedAt: 1234
     // })
+
+    socket.on('join', (params, callback) => {
+        console.log('Inside join')
+        if(!isRealString(params.name) || !isRealString(params.room)) {
+            callback('Name and room name are required')
+        } 
+        callback()
+    })
+
 
     // data in event from client to server
     // listen to create Message

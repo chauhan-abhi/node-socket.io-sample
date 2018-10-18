@@ -20,6 +20,18 @@ function scrollToButtom() {
 
 
 socket.on('connect', function() {
+    var parmas = jQuery.deparam(window.location.search)
+    //emit join event by client to server .
+    // when server listens to this its going to set of process of setting a room
+    socket.emit('join', parmas, function(err) {
+        if(err) {
+           alert(err)
+           //redirect to home page 
+           window.location.href = "/" 
+        } else {
+            console.log('No error')
+        }
+    })
     console.log('Connected to server')  
     
     //create email event
@@ -52,6 +64,15 @@ socket.on('disconnect', function() {
 // socket.on('newEmail', function(email) {
 //     console.log('New Email', email)
 // })
+
+
+socket.on('updateUserList', function(users) {
+    var ol = jQuery('<ol></ol>')
+    users.forEach(function (user) {
+        ol.append(jQuery('<li></li>').text(user))
+    })
+    jQuery('#users').html(ol)
+})
 
 socket.on('newMessage', function(message) {
     var formattedTime = moment(message.createdAt).format('h:mm a') 
@@ -97,10 +118,9 @@ jQuery("#message-form").on('submit', function(event) {
     event.preventDefault()
     var messageTextBox = jQuery('[name=message]')
     socket.emit('createMessage', {
-        from: 'User',
         //select input from name 
         text: messageTextBox.val()
-    }, function() {
+    }, function () {
         //clear the text box value
         messageTextBox.val('')
     })
